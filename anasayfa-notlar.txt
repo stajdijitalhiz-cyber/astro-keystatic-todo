@@ -1,0 +1,7 @@
+Anasayfa başarıyla yüklendi ve todo listesi görüntüleniyor:
+
+✅ Yapılacak (1 görev): ornek-gorev-1
+✅ Yapılıyor (1 görev): ornek-gorev-2  
+✅ Yapıldı (1 görev): ornek-gorev-3
+
+Her kategori ayrı sütunda gösteriliyor ve görevler kartlar halinde listeleniyor.

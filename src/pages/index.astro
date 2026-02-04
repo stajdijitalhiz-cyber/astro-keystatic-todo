@@ -1,0 +1,216 @@
+---
+import { getCollection } from 'astro:content';
+
+// Tüm todoları al
+const allTodos = await getCollection('todos');
+
+// Durumlara göre grupla
+const todosByStatus = {
+  todo: allTodos.filter(todo => todo.data.status === 'todo'),
+  'in-progress': allTodos.filter(todo => todo.data.status === 'in-progress'),
+  done: allTodos.filter(todo => todo.data.status === 'done'),
+};
+
+const statusLabels = {
+  todo: 'Yapılacak',
+  'in-progress': 'Yapılıyor',
+  done: 'Yapıldı',
+};
+---
+
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Todo List - Astro + Keystatic</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        color: white;
+        margin-bottom: 3rem;
+      }
+
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .admin-link {
+        display: inline-block;
+        background: white;
+        color: #667eea;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .admin-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .board {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .column {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .column-header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid;
+      }
+
+      .column.todo .column-header {
+        color: #f59e0b;
+        border-color: #f59e0b;
+      }
+
+      .column.in-progress .column-header {
+        color: #3b82f6;
+        border-color: #3b82f6;
+      }
+
+      .column.done .column-header {
+        color: #10b981;
+        border-color: #10b981;
+      }
+
+      .todo-card {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .todo-card:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .column.todo .todo-card {
+        border-color: #f59e0b;
+      }
+
+      .column.in-progress .todo-card {
+        border-color: #3b82f6;
+      }
+
+      .column.done .todo-card {
+        border-color: #10b981;
+      }
+
+      .todo-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+      }
+
+      .todo-content {
+        color: #6b7280;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin-bottom: 0.75rem;
+      }
+
+      .todo-date {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #9ca3af;
+        font-style: italic;
+      }
+
+      .count-badge {
+        display: inline-block;
+        background: #e5e7eb;
+        color: #6b7280;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>📋 Todo List</h1>
+        <a href="/keystatic" class="admin-link">🔧 Yönetim Paneli</a>
+      </header>
+
+      <div class="board">
+        {Object.entries(todosByStatus).map(([status, todos]) => (
+          <div class={`column ${status}`}>
+            <div class="column-header">
+              {statusLabels[status as keyof typeof statusLabels]}
+              <span class="count-badge">{todos.length}</span>
+            </div>
+            
+            {todos.length === 0 ? (
+              <div class="empty-state">Henüz görev yok</div>
+            ) : (
+              todos.map((todo) => (
+                <div class="todo-card">
+                  <div class="todo-title">{todo.data.title}</div>
+                  <div class="todo-content">
+                    {todo.body}
+                  </div>
+                  <div class="todo-date">
+                    📅 {new Date(todo.data.createdAt).toLocaleDateString('tr-TR')}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </body>
+</html>
