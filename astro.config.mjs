@@ -8,8 +8,6 @@ import netlify from '@astrojs/netlify';
 // https://astro.build/config
 export default defineConfig({
   integrations: [react(), markdoc(), keystatic()],
-  output: 'hybrid', // Panel için dinamik, anasayfa için statik destek sağlar
-  adapter: netlify({
-    edgeMiddleware: true,
-  }),
+  output: 'server',
+  adapter: netlify(),
 });
