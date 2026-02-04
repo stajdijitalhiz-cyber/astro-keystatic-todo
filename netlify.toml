@@ -2,5 +2,5 @@
   command = "pnpm build"
   publish = "dist"
 
-[functions]
-  node_version = "22"
+[build.environment]
+  NODE_VERSION = "22"
